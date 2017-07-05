@@ -1,13 +1,20 @@
-﻿
 class App extends React.Component {
 
   constructor() {
     super();
+    this.handleClickCarousel = this.handleClickCarousel.bind(this);
+    this.state = { carouselName : "slide1"}
+  }
+  
+  handleClickCarousel(name) {
+    this.setState({
+      carouselName : name
+    }); 
   }
   
   render() {
      var informationSlides = [
-      { style: "slide1 flex-active-slide", fx1: "title1 captionDelay2 FromTop", 
+      { style: "slide1", fx1: "title1 captionDelay2 FromTop", 
         fx2: "title2 captionDelay4 FromTop", fx3: "title3 captionDelay6 FromTop", 
         fx4: "title4 captionDelay7 FromTop", title1: "Lyon", title2: "vacances été",
         title3: "2017", title4: "Vacance au calme dans une petite maison de campagne"},
@@ -26,18 +33,25 @@ class App extends React.Component {
     
     var slides = [];
     for(var i =0; i<informationSlides.length; i++) {
-      slides.push(<Slide data={informationSlides[i]} />);
+      var activeClass = null;
+      if(this.state.carouselName == informationSlides[i].style) {
+        activeClass = "flex-active-slide";
+      }
+      slides.push(<Slide activeClass={activeClass} data={informationSlides[i]} />);
     }
     
     var informationCarousel = [
-      { target: "slide1", style: "flex-active-slide", src: "images/slider/slide1_bg.jpg"},
+      { target: "slide1", style: "", src: "images/slider/slide1_bg.jpg"},
       { target: "slide2", style: "", src: "images/slider/slide2_bg.jpg"},
-      { target: "slide3", style: "", src: "images/slider/slide3_bg.jpg"},
       { target: "slide3", style: "", src: "images/slider/slide3_bg.jpg"}
     ];
     var carousels = [];
     for(var  i=0; i<informationCarousel.length; i++){
-      carousels.push(<Carousel data={informationCarousel[i]}/>);
+      var activeClass = null;
+      if(this.state.carouselName == informationCarousel[i].target) {
+        activeClass = "flex-active-slide";
+      }
+      carousels.push(<Carousel activeClass={activeClass} handleClickCarousel={this.handleClickCarousel} data={informationCarousel[i]} />);
     }
       
     
@@ -91,8 +105,11 @@ class Slide extends React.Component {
   }
   
   render() {
+    
+    var allClass = this.props.data.style+' '+this.props.activeClass;
+    
     return (
-    <li className={this.props.data.style}>
+    <li className={allClass}>
       <div className="flex_caption1">
         <p className={this.props.data.fx1}>{this.props.data.title1}</p>
         <p className={this.props.data.fx2}>{this.props.data.title2}</p>
@@ -108,11 +125,16 @@ class Carousel extends React.Component {
 
   constructor() {
     super();
+    this.handleClick = this.handleClick.bind(this);
+  }
+  
+  handleClick() {
+    this.props.handleClickCarousel(this.props.data.target);
   }
   
   render() {
     return(
-      <li data-target={this.props.data.target} className={this.props.data.style}><img src={this.props.data.src} alt="" /></li>        
+      <li onClick={this.handleClick} data-target={this.props.data.target} className={this.props.activeClass}><img src={this.props.data.src} alt="" /></li>        
     );
   }
 
